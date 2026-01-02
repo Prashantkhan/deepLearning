@@ -1,0 +1,4 @@
+# Add project dependencies here
+torch
+numpy
+pandas

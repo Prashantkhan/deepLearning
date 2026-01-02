@@ -1,0 +1,85 @@
+# Multimodal CLIP + Probe configuration for Amazon Product Classification
+# Day 1-4 coursework: image + text fusion for category prediction
+
+# Dataset & Paths
+dataset:
+  raw_csv: data/raw/labels.csv
+  processed_csv: data/processed_labels.csv
+  images_dir: data/images
+  embeddings_dir: embeddings
+  models_dir: models
+  results_dir: results
+  logs_dir: logs
+
+# Category selection
+categories:
+  top_k: 5  # Select top-5 categories; extend until each has >= min_per_class examples
+  min_per_class: 200  # Minimum examples per class threshold
+  max_per_class: 3000  # Cap class size by random sampling
+
+# Train/val split
+split:
+  train_frac: 0.8
+  val_frac: 0.2
+  stratified: true
+  random_seed: 42
+
+# Text preprocessing
+text:
+  max_length: 77  # CLIP tokenizer max length
+  separator: " || "  # Separator between product name and description
+
+# Image preprocessing
+image:
+  size: 224  # CLIP ViT-base-patch32 input size
+  resize_method: bilinear
+
+# CLIP model
+clip:
+  model_name: openai/clip-vit-base-patch32
+  freeze_encoders: true  # Freeze CLIP weights; only train probe
+  embedding_dim: 512  # Pooled embedding dimension (after fusion)
+
+# Embedding extraction
+embedding:
+  image_batch_size: 32
+  text_batch_size: 64
+  device: cuda  # or cpu if no GPU
+  num_workers: 4  # Set to 0 in Colab or --debug mode
+
+# Probe architecture (PyTorch MLP)
+probe:
+  type: mlp  # or sklearn_logistic for CPU fallback
+  input_dim: 1024  # 512 (image) + 512 (text) concatenated, L2-normalized
+  hidden_dim: 256
+  num_classes: 5
+  dropout: 0.2
+  activation: relu
+
+# Training hyperparameters
+training:
+  epochs: 10
+  batch_size: 64  # Reduce to 16 if low memory
+  learning_rate: 1e-3
+  weight_decay: 1e-4
+  optimizer: adam
+  loss_fn: cross_entropy
+  early_stopping_patience: 3
+  device: cuda  # or cpu
+
+# Evaluation
+evaluation:
+  metrics: [accuracy, precision, recall, f1, macro_f1]
+  confusion_matrix: true
+  save_plots: true
+
+# Reproducibility
+reproducibility:
+  seed: 42
+  deterministic: true
+
+# Debug mode
+debug:
+  enabled: false
+  max_per_class: 1000  # Override default max_per_class when debug=true
+  num_workers: 0  # Always 0 in Colab

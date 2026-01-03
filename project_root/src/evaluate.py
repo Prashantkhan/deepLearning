@@ -1,23 +1,3 @@
-"""Evaluate trained probe on validation set and compute metrics.
-
-CLI example:
-    python src/evaluate.py \
-        --model models/multimodal_best.pth \
-        --emb_dir embeddings \
-        --out_dir results
-
-This script:
-- Loads trained MLP probe and val embeddings
-- Computes accuracy, per-class precision/recall/F1, macro F1
-- Generates confusion matrix PNG
-- Saves results/metrics.json with all metrics
-
-Design decisions:
-- Uses sklearn metrics for standard evaluation
-- Confusion matrix visualization with matplotlib
-- Per-class metrics for interpretability
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -44,8 +24,6 @@ LOGGER = logging.getLogger("evaluate")
 
 
 class MLPProbe(nn.Module):
-    """Lightweight MLP probe: 1024 → 256 → num_classes."""
-
     def __init__(self, input_dim: int = 1024, hidden_dim: int = 256, num_classes: int = 5, dropout: float = 0.2):
         super().__init__()
         self.fc1 = nn.Linear(input_dim, hidden_dim)
@@ -60,9 +38,8 @@ class MLPProbe(nn.Module):
         x = self.fc2(x)
         return x
 
-
 def load_model_and_embeddings(model_path: str, emb_dir: str, labels_csv: str, device: str = "cpu"):
-    """Load trained model and validation embeddings."""
+    #Loading trained model and validation embeddings.
     # Load checkpoint
     checkpoint = torch.load(model_path, map_location=device)
     label_map = checkpoint["label_map"]
@@ -112,7 +89,7 @@ def evaluate(
     out_dir: str,
     device: str = "cpu",
 ) -> None:
-    """Evaluate model on validation set."""
+    #Evaluating model on validation set.
     Path(out_dir).mkdir(parents=True, exist_ok=True)
 
     model, val_X, val_y, label_map, device = load_model_and_embeddings(
@@ -140,7 +117,7 @@ def evaluate(
     # Confusion matrix
     cm = confusion_matrix(y_true, y_pred)
 
-    # Prepare metrics dict
+    # Preparing metrics dict
     reverse_label_map = {int(v): k for k, v in label_map.items()}
     metrics = {
         "accuracy": float(acc),
@@ -155,7 +132,7 @@ def evaluate(
         },
     }
 
-    # Save metrics.json
+    # Saving metrics.json
     metrics_file = os.path.join(out_dir, "metrics.json")
     with open(metrics_file, "w") as f:
         json.dump(metrics, f, indent=2)

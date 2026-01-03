@@ -1,18 +1,3 @@
-"""Inference: predict class for new image + text pair.
-
-CLI examples:
-    python src/infer.py \
-        --model models/multimodal_best.pth \
-        --image_url "https://example.com/image.jpg" \
-        --text "Product Name || Product Description"
-
-This script:
-- Loads trained MLP probe
-- Uses CLIP to embed new image + text
-- Fuses embeddings (concatenate + L2-norm)
-- Outputs class probabilities and top prediction
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -35,8 +20,6 @@ LOGGER = logging.getLogger("infer")
 
 
 class MLPProbe(nn.Module):
-    """Lightweight MLP probe: 1024 → 256 → num_classes."""
-
     def __init__(self, input_dim: int = 1024, hidden_dim: int = 256, num_classes: int = 5, dropout: float = 0.2):
         super().__init__()
         self.fc1 = nn.Linear(input_dim, hidden_dim)
@@ -53,7 +36,7 @@ class MLPProbe(nn.Module):
 
 
 def load_image_from_url(image_url: str, timeout: int = 10) -> Image.Image:
-    """Download image from URL."""
+    #Downloading image from URL
     headers = {
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
     }
@@ -75,18 +58,7 @@ def infer(
     clip_model: str = "openai/clip-vit-base-patch32",
     device: str = "cpu",
 ) -> Dict:
-    """Perform inference on image + text pair.
-
-    Args:
-        model_path: Path to trained .pth checkpoint
-        image_source: URL or local path to image
-        text: Product text (name + description)
-        clip_model: CLIP model name
-        device: cpu or cuda
-
-    Returns:
-        Dict with predictions, probabilities, label_map
-    """
+    
     # Load checkpoint
     checkpoint = torch.load(model_path, map_location=device)
     label_map = checkpoint["label_map"]

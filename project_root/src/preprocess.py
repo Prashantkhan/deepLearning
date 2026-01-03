@@ -1,29 +1,3 @@
-"""Create `data/processed_labels.csv` for the multimodal probe task.
-
-CLI example:
-	python src/preprocess.py \
-		--raw_csv data/raw/labels.csv \
-		--out_csv data/processed_labels.csv \
-		--seed 42 \
-		--max_per_class 3000
-
-This script:
-- selects the top-5 (or more if needed) categories with at least 200 examples each
-- constructs a `text` field by concatenating product name and product description with `||`
-- selects / caps examples per class (random sampling, reproducible)
-- chooses the first valid image URL (stores it in `image_path` for downstream downloader)
-- creates a stratified 80/20 train/val split (column `split`)
-
-The produced CSV has columns: `uniq_id,image_path,text,label,category_name,split`
-Note: `image_path` initially contains the chosen image URL; `src/download_images.py`
-will download and replace it with a local path.
-
-Design decisions:
-- Robust to common column name variations in the raw CSV.
-- Minimal text cleaning (whitespace, unicode normalization).
-- Uses seed_everything for reproducibility.
-"""
-
 from __future__ import annotations
 
 import argparse

@@ -44,9 +44,6 @@ project_root/
 │  └── label_map.json           # Category → class mapping
 ├── models/
 │  └── multimodal_best.pth      # Trained MLP probe checkpoint
-├── notebooks/
-│  ├── eda.ipynb                # Exploratory data analysis
-│  └── colab_run.ipynb          # Step-by-step Colab notebook
 ├── results/
 │  ├── metrics.json             # Accuracy, precision, recall, F1
 │  └── confusion.png            # Confusion matrix visualization
@@ -62,19 +59,18 @@ project_root/
 ├── logs/
 │  └── train_log.csv            # Epoch-wise loss & accuracy
 ├── requirements.txt
-├── README.md (this file)
-├── viva_prep.md                # Viva discussion notes & ethics
-└── 4-day_roadmap.md            # Day-by-day task breakdown
+└──  README.md (this file)
+
 ```
 
-## Quick Start (4-Day Pipeline)
+## Quick Start 
 
 ### Prerequisites
 ```bash
 pip install torch torchvision transformers pillow requests pandas scikit-learn matplotlib seaborn numpy
 ```
 
-### Day 1: Data Preprocessing
+### Data Preprocessing
 ```bash
 python src/preprocess.py \
   --raw_csv data/raw/labels.csv \
@@ -84,7 +80,7 @@ python src/preprocess.py \
 ```
 **Output**: `data/processed_labels.csv` (1,875 rows, stratified 80/20 split)
 
-### Day 2: Image Download & CLIP Embeddings
+### Image Download & CLIP Embeddings
 ```bash
 python src/download_images.py \
   --labels_csv data/processed_labels.csv \
@@ -100,7 +96,7 @@ python src/extract_clip_embeddings.py \
 ```
 **Output**: `embeddings/*.npy`, `embeddings/label_map.json`
 
-### Day 3: Train Probe
+### Train Probe
 ```bash
 python src/train_probe.py \
   --emb_dir embeddings \
@@ -112,7 +108,7 @@ python src/train_probe.py \
 ```
 **Output**: `models/multimodal_best.pth`, `logs/train_log.csv`
 
-### Day 4: Evaluate & Infer
+### Evaluate & Infer
 ```bash
 python src/evaluate.py \
   --model models/multimodal_best.pth \
@@ -202,18 +198,13 @@ Stuffed Animals:     P=0.99, R=0.98, F1=0.98
 Action Figures:      P=0.99, R=0.98, F1=0.99
 ```
 
-## For Viva / Presentation
-
-- See `viva_prep.md` for discussion notes, biases, and Q&A talking points
-- Key takeaway: CLIP's pre-trained joint embeddings are powerful; lightweight probe achieves 98% val accuracy
-- Why not ResNet+DistilBERT? CLIP provides **aligned** image-text space, reducing engineering complexity
-
 ## References
 
 - CLIP: [Learning Transferable Models for Unsupervised Visual Representation Learning](https://arxiv.org/abs/2103.14030)
 - Amazon Product Dataset 2020: [Kaggle](https://www.kaggle.com/datasets/promptcloud/amazon-product-dataset-2020/)
 - Hugging Face: [transformers](https://huggingface.co/docs/transformers/), [CLIP](https://huggingface.co/openai/clip-vit-base-patch32)
+- Github Repo: https://github.com/Prashantkhan/deepLearning
 
 ---
 
-**Created**: January 2026 | **Course**: ML Coursework | **Status**: Complete (4-day delivery)
+**Created**: January 2026 | **Course**: Deep learning and Neural Coursework 

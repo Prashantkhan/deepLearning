@@ -1,30 +1,3 @@
-"""Train a lightweight MLP probe on top of frozen CLIP embeddings.
-
-CLI example:
-    python src/train_probe.py \
-        --emb_dir embeddings \
-        --out_dir models \
-        --epochs 10 \
-        --batch_size 64 \
-        --lr 1e-3 \
-        --device cuda
-
-This script:
-- Loads concatenated image + text embeddings (1024-dim) from embeddings/
-- Loads labels and train/val split from processed_labels.csv
-- Trains a PyTorch MLP: 1024 → 256 (ReLU) → 5 classes
-- Dropout 0.2, early stopping (patience=3)
-- Saves best checkpoint to models/multimodal_best.pth
-- Logs epoch-wise metrics to logs/train_log.csv
-
-Design decisions:
-- CLIP encoders remain frozen (no fine-tuning)
-- Uses cross-entropy loss with optional class weighting
-- Early stopping on val loss with patience=3
-- Checkpoint includes: model_state_dict, optimizer_state_dict, epoch, best_val_loss, label_map, config
-- torch.cuda.amp for mixed precision (if CUDA available)
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -47,7 +20,6 @@ LOGGER = logging.getLogger("train_probe")
 
 
 def seed_everything(seed: int) -> None:
-    """Set seed for python, numpy, random, and torch."""
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -56,7 +28,6 @@ def seed_everything(seed: int) -> None:
 
 
 class MLPProbe(nn.Module):
-    """Lightweight MLP probe: 1024 → 256 → num_classes."""
 
     def __init__(self, input_dim: int = 1024, hidden_dim: int = 256, num_classes: int = 5, dropout: float = 0.2):
         super().__init__()

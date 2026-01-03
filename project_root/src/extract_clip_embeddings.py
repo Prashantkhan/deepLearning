@@ -1,35 +1,3 @@
-"""Extract multimodal CLIP embeddings (image + text) and save as .npy files.
-
-CLI example:
-    python src/extract_clip_embeddings.py \
-        --labels_csv data/processed_labels.csv \
-        --out_dir embeddings \
-        --clip_model openai/clip-vit-base-patch32 \
-        --image_batch 32 \
-        --text_batch 64
-
-This script:
-- Loads processed_labels.csv (image paths + text)
-- Uses CLIP (openai/clip-vit-base-patch32) to extract:
-  * image_embedding (pooled, 512-dim)
-  * text_embedding (pooled, 512-dim)
-- L2-normalizes each embedding independently
-- Concatenates: [image_embedding, text_embedding] → 1024-dim feature vector
-- Saves:
-  * embeddings/image_embeddings.npy (N, 512)
-  * embeddings/text_embeddings.npy (N, 512)
-  * embeddings/labels.npy (N,) int labels 0..4
-  * embeddings/ids.npy (N,) uniq_ids (object array)
-  * embeddings/label_map.json (category name → label int)
-
-Design decisions:
-- CLIP encoders are frozen (no fine-tuning)
-- Batch processing for efficiency (configurable batch sizes)
-- L2 normalization before fusion (standard for CLIP)
-- Uses torch.cuda.amp if CUDA available (mixed precision)
-- Num_workers set to 0 in Colab (set via --num_workers or config)
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -50,7 +18,6 @@ LOGGER = logging.getLogger("extract_clip_embeddings")
 
 
 def seed_everything(seed: int) -> None:
-    """Set seed for python, numpy, random, and torch."""
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -59,8 +26,6 @@ def seed_everything(seed: int) -> None:
 
 
 class CLIPEmbedder:
-    """Extract CLIP embeddings from images and texts."""
-
     def __init__(
         self, model_name: str = "openai/clip-vit-base-patch32", device: str = "cpu"
     ):
@@ -89,7 +54,7 @@ class CLIPEmbedder:
 
     @torch.no_grad()
     def embed_texts(self, texts: list[str]) -> np.ndarray:
-        """Embed a batch of texts. Returns (N, 512) embeddings."""
+        #Embed a batch of texts. Returns (N, 512) embeddings.
         inputs = self.processor(text=texts, return_tensors="pt", padding=True).to(
             self.device
         )
@@ -107,7 +72,7 @@ def extract_embeddings(
     text_batch_size: int = 64,
     device: str = "cpu",
 ) -> None:
-    """Load processed labels, extract CLIP embeddings, save .npy files."""
+    #Load processed labels, extract CLIP embeddings, save .npy files.
     # Create output directory
     Path(out_dir).mkdir(parents=True, exist_ok=True)
 

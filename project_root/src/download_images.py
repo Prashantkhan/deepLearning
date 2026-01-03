@@ -1,27 +1,3 @@
-"""Download product images from URLs and cache locally.
-
-CLI example:
-    python src/download_images.py \
-        --labels_csv data/processed_labels.csv \
-        --out_dir data/images \
-        --seed 42
-
-This script:
-- Reads `data/processed_labels.csv` (which has image URLs in `image_path` column)
-- Downloads the first valid URL for each row to `data/images/<uniq_id>.jpg`
-- Caches: skips re-downloading existing files
-- Handles redirects, timeouts, retries (3 attempts per URL)
-- Updates `data/processed_labels.csv` to replace URLs with local file paths
-- Marks failed downloads (missing images in final CSV)
-
-Design decisions:
-- Robust to network failures: retries with exponential backoff
-- Filters out placeholder/transparent images before download
-- Uses requests library with proper User-Agent
-- Saves images as JPEG (lossy but memory-efficient)
-- Logs download progress and failures for debugging
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -50,17 +26,13 @@ BACKOFF_FACTOR = 0.5
 
 
 def seed_everything(seed: int) -> None:
-    """Set seed for python, numpy and random to ensure reproducibility."""
     random.seed(seed)
     np.random.seed(seed)
 
 
 def download_image(url: str, output_path: str, timeout: int = TIMEOUT) -> bool:
-    """Download image from URL and save to output_path.
+   #Downloading image from URL and save to output_path.
 
-    Returns True if successful, False otherwise.
-    Handles retries, redirects, and timeouts.
-    """
     # Basic validation
     if not url or not isinstance(url, str):
         return False

@@ -174,6 +174,9 @@ See `configs/multimodal.yaml` for full configuration. Key parameters:
 - **Epochs**: 10 (early stop at epoch 9 in this run)
 - **CLIP encoder**: Frozen (no fine-tuning)
 
+##for inference refer this link:
+https://github.com/Prashantkhan/deepLearning/releases/tag/rodelanesegmentation
+
 ## Reproducibility
 
 - **Seed**: 42 (python, numpy, random, torch)
